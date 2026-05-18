@@ -83,7 +83,7 @@ export default function Hero() {
           muted
           loop
           playsInline
-          className="w-full h-full object-contain object-bottom"
+          className="w-full h-full object-contain object-bottom mix-blend-screen"
           src="/videos/left-character.mp4"
         />
       </div>
@@ -95,7 +95,7 @@ export default function Hero() {
           muted
           loop
           playsInline
-          className="w-full h-full object-contain object-bottom"
+          className="w-full h-full object-contain object-bottom mix-blend-screen"
           src="/videos/right-character.mp4"
         />
       </div>
@@ -107,7 +107,7 @@ export default function Hero() {
           muted
           loop
           playsInline
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain mix-blend-screen"
           src="/videos/left-character.mp4"
         />
       </div>
