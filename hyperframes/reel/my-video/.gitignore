@@ -1,5 +1,6 @@
 node_modules/
 .hyperframes/
+renders/
 *.mp4
 *.webm
 dist/
