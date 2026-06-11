@@ -3,5 +3,8 @@ node_modules/
 renders/
 *.mp4
 *.webm
+*.mp3
+*.wav
+*.m4a
 dist/
 out/
