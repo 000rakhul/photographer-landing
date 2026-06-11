@@ -1,0 +1,17 @@
+[Beat 1 — 0.0–9.7s — Hook]
+Anthropic just dropped a model that mass produces lead gen systems while you sleep. Fable 5 doesn't run workflows. It builds them from scratch, autonomously, in Claude Code.
+
+[Beat 2 — 9.7–34.3s — Build from a prompt]
+So you tell it "build me a system that scrapes LinkedIn job posts, identifies the hiring manager, and drafts a cold email personalized to the role." And here's what's different. It doesn't just follow a recipe. It plans the architecture, writes the scraper, builds the email logic, tests everything, fixes its own bugs, and hands you a working system. You're not configuring steps in someone else's platform. You own the code.
+
+[Beat 3 — 34.3–57.6s — Sell the output]
+But the real play is selling the output. You tell Fable 5 "build me an overnight competitor tracker that monitors five companies, pulls their latest moves, and generates a one-page morning brief." It will code the entire pipeline, the data collection, the analysis layer, the email delivery. Then you charge clients $500 a month for that daily brief. Land 20 clients, that's $10,000 a month in recurring revenue.
+
+[Beat 4 — 57.6–78.3s — Three reasons]
+And here's why Fable 5 makes this better than any workflow tool. One, it runs autonomously for days. You give it the goal, walk away, come back to a finished product. Two, you own the infrastructure. No vendor lock-in, no per-run fees eating your margin. Three, it self-corrects. When something breaks at 2am, the agent catches it, debugs it, patches it.
+
+[Beat 5 — 78.3–88.3s — Outcome as a service]
+That's outcome as a service with an actual moat. The client buys the outcome, the agent builds and maintains the system, and you keep the margin without paying a middleware tax.
+
+[Beat 6 — 88.3–97.0s — CTA]
+By the way, I'm breaking down seven agent startup ideas you can build with Fable 5 in Claude Code. Comment "agent ideas" and I'll send them over.
