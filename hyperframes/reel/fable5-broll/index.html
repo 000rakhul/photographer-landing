@@ -1,0 +1,1495 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #F2EDE3;
+        color: #1A2622;
+      }
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+      }
+      .serif-italic {
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      .mono {
+        font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+      }
+
+      /* Background grid — always visible, sits behind every beat */
+      #bg-grid {
+        position: absolute;
+        inset: 0;
+        background-color: #F2EDE3;
+        background-image:
+          linear-gradient(rgba(26, 38, 34, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(26, 38, 34, 0.06) 1px, transparent 1px);
+        background-size: 80px 80px;
+        background-position: 0 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      /* Faint radial vignette so the cream has body */
+      #bg-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(242, 237, 227, 0) 40%,
+          rgba(180, 160, 130, 0.18) 100%
+        );
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      /* Scene wrappers — each fills the full canvas */
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 1;
+        overflow: hidden;
+      }
+      .scene-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 120px 80px;
+        gap: 40px;
+        box-sizing: border-box;
+      }
+
+      /* Shared surfaces */
+      .float {
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .dark-tile {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 28px;
+        padding: 36px 56px;
+      }
+      .dark-pill {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 999px;
+        padding: 24px 48px;
+      }
+      .led-dot {
+        position: absolute;
+        top: 22px;
+        left: 22px;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: #E87B50;
+        box-shadow: 0 0 18px rgba(232, 123, 80, 0.6);
+      }
+
+      /* ===== Beat 1 ===== */
+      #beat1 .scene-content { gap: 28px; }
+      .b1-tile {
+        position: relative;
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 28px;
+        padding: 36px 56px;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      #b1-top {
+        font-size: 36px;
+        letter-spacing: 0.18em;
+        color: #E8DFCE;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        padding: 28px 80px;
+      }
+      #b1-mid {
+        font-size: 180px;
+        line-height: 1;
+        padding: 80px 100px 90px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        min-width: 700px;
+        text-align: center;
+      }
+      #b1-bot {
+        font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+        font-size: 44px;
+        padding: 32px 64px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      #b1-cursor {
+        display: inline-block;
+        width: 18px;
+        height: 44px;
+        background: #E87B50;
+        vertical-align: middle;
+        margin-left: 8px;
+      }
+      #b1-dashed {
+        margin-top: 30px;
+        width: 4px;
+        height: 120px;
+        background-image: linear-gradient(
+          to bottom,
+          #1A2622 0,
+          #1A2622 12px,
+          transparent 12px,
+          transparent 24px
+        );
+        background-size: 4px 24px;
+        background-repeat: repeat-y;
+        transform-origin: top center;
+      }
+
+      /* ===== Beat 2 ===== */
+      #beat2 .scene-content { padding: 100px 60px; gap: 30px; justify-content: flex-start; }
+      #b2-title {
+        font-size: 36px;
+        color: #1A2622;
+        letter-spacing: 0.1em;
+        margin-top: 40px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      #b2-bubble {
+        max-width: 920px;
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 40px;
+        padding: 48px 56px;
+        font-size: 42px;
+        line-height: 1.35;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+      }
+      #b2-bubble .word {
+        display: inline-block;
+        opacity: 0;
+        margin-right: 0.25em;
+      }
+      /* Pipeline */
+      .b2-pipeline {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        margin-top: 30px;
+      }
+      .b2-node {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 28px;
+        padding: 26px 44px;
+        font-size: 38px;
+        min-width: 620px;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      .b2-node .badge {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-family: "Inter", sans-serif;
+        font-style: normal;
+        font-size: 26px;
+        background: #E87B50;
+        color: #1A2622;
+      }
+      .b2-link {
+        width: 4px;
+        height: 36px;
+        background-image: linear-gradient(
+          to bottom,
+          #E87B50 0,
+          #E87B50 10px,
+          transparent 10px,
+          transparent 20px
+        );
+        background-size: 4px 20px;
+        background-repeat: repeat-y;
+        transform-origin: top center;
+      }
+      /* Checklist */
+      .b2-check-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-top: 24px;
+        align-items: flex-start;
+        width: 720px;
+      }
+      .b2-check {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 999px;
+        padding: 18px 36px;
+        font-size: 34px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b2-check .tick {
+        color: #E87B50;
+        font-weight: 700;
+        font-family: "Inter", sans-serif;
+        font-style: normal;
+        font-size: 32px;
+      }
+      #b2-callout {
+        font-size: 90px;
+        color: #1A2622;
+        margin-top: 30px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      /* ===== Beat 3 ===== */
+      #beat3 .scene-content { padding: 100px 80px; gap: 30px; justify-content: center; }
+      #b3-dash-title {
+        font-size: 48px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .b3-card {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 32px;
+        padding: 40px 50px;
+        width: 820px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b3-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        background: #0F1A17;
+        border-radius: 18px;
+        font-size: 34px;
+      }
+      .b3-row .name {
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        color: #F2EDE3;
+      }
+      .b3-row .delta {
+        color: #E87B50;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      /* Ticket pill */
+      .b3-pricing {
+        position: relative;
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 999px;
+        padding: 80px 140px;
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b3-pricing::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 999px;
+        border: 3px dashed #E87B50;
+        pointer-events: none;
+      }
+      .b3-pricing .amount {
+        font-size: 200px;
+        line-height: 1;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      .b3-pricing .per {
+        font-size: 44px;
+        color: #E8DFCE;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      /* Counter */
+      .b3-counter {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+      }
+      #b3-amount {
+        font-size: 240px;
+        color: #1A2622;
+        font-family: "Inter", sans-serif;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+      #b3-sub {
+        font-size: 40px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      .b3-dot {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #E87B50;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .b3-confetti {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      /* ===== Beat 4 ===== */
+      #beat4 .scene-content { padding: 100px 80px; gap: 40px; justify-content: center; }
+      #b4-heading {
+        font-size: 80px;
+        color: #1A2622;
+        text-align: center;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        line-height: 1.1;
+      }
+      .b4-number {
+        font-size: 220px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        line-height: 1;
+        text-align: center;
+      }
+      .b4-sub {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 999px;
+        padding: 28px 52px;
+        font-size: 40px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        text-align: center;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b4-strike {
+        position: relative;
+        background: #F2EDE3;
+        color: #1A2622;
+        border: 2px solid #1A2622;
+        border-radius: 999px;
+        padding: 18px 36px;
+        font-size: 32px;
+        font-family: "Inter", sans-serif;
+        margin: 0 8px;
+        display: inline-flex;
+        align-items: center;
+        overflow: hidden;
+      }
+      .b4-strike-row {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        margin-top: 16px;
+      }
+      .b4-strike .line {
+        position: absolute;
+        left: 8%;
+        right: 100%;
+        top: 50%;
+        height: 4px;
+        background: #E87B50;
+        transform-origin: left center;
+      }
+      .b4-clock {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 28px;
+        padding: 30px 50px;
+        font-size: 80px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b4-err {
+        background: #C0613B;
+        color: #F2EDE3;
+        border-radius: 999px;
+        padding: 18px 32px;
+        font-size: 28px;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .b4-patching {
+        background: #1A2622;
+        color: #E87B50;
+        border-radius: 999px;
+        padding: 16px 28px;
+        font-size: 26px;
+        font-family: "Inter", sans-serif;
+      }
+      .b4-fixed {
+        background: #1A2622;
+        color: #7AA38B;
+        border-radius: 999px;
+        padding: 18px 32px;
+        font-size: 32px;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+      }
+
+      /* ===== Beat 5 ===== */
+      #beat5 .scene-content { padding: 120px 60px; gap: 30px; }
+      #b5-label {
+        font-size: 50px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        position: relative;
+      }
+      #b5-underline {
+        height: 4px;
+        background: #E87B50;
+        width: 320px;
+        transform-origin: left center;
+        margin: 10px auto 0;
+      }
+      .b5-flow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 20px;
+        width: 100%;
+      }
+      .b5-step {
+        background: #1A2622;
+        color: #F2EDE3;
+        border-radius: 28px;
+        padding: 26px 40px;
+        font-size: 40px;
+        text-align: center;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b5-step.money {
+        background: #E87B50;
+        color: #1A2622;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 22px 36px;
+        font-size: 56px;
+        width: 220px;
+        margin: 0 auto;
+      }
+      .b5-step.agent {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+      }
+      .b5-mascot {
+        width: 80px;
+        height: 80px;
+        background: #F2EDE3;
+        border-radius: 50% 50% 30% 30%;
+        position: relative;
+        box-shadow: 0 0 28px rgba(93, 217, 214, 0.45);
+      }
+      .b5-mascot::before,
+      .b5-mascot::after {
+        content: "";
+        position: absolute;
+        top: 32px;
+        width: 10px;
+        height: 14px;
+        background: #1A2622;
+        border-radius: 50%;
+      }
+      .b5-mascot::before { left: 22px; }
+      .b5-mascot::after { right: 22px; }
+      .b5-arrow {
+        font-size: 34px;
+        color: #E87B50;
+        text-align: center;
+        line-height: 1;
+        height: 24px;
+      }
+      #b5-tagline {
+        font-size: 44px;
+        margin-top: 26px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      #b5-tagline .strike-word {
+        position: relative;
+        display: inline-block;
+      }
+      #b5-tagline-strike {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 55%;
+        height: 4px;
+        background: #E87B50;
+        transform-origin: left center;
+      }
+
+      /* ===== Beat 6 ===== */
+      #beat6 .scene-content { padding: 80px 60px; justify-content: space-between; }
+      #b6-caption {
+        font-size: 34px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        text-align: center;
+        margin-top: 40px;
+      }
+      #b6-heading-wrap {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      #b6-heading {
+        font-size: 72px;
+        color: #1A2622;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 500;
+        text-align: center;
+        line-height: 1.15;
+        max-width: 900px;
+      }
+      #b6-underline {
+        height: 5px;
+        background: #E87B50;
+        width: 520px;
+        transform-origin: left center;
+      }
+      .b6-spacer { flex: 1; }
+      .b6-composer {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        background: #1A2622;
+        border-radius: 999px;
+        padding: 22px 26px;
+        width: 100%;
+        margin-bottom: 60px;
+        box-shadow:
+          0 24px 40px rgba(15, 22, 18, 0.28),
+          inset 0 2px 0 rgba(255, 255, 255, 0.05);
+      }
+      .b6-avatar {
+        width: 74px;
+        height: 74px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #E8B16C 0%, #C67A5C 100%);
+        flex: 0 0 auto;
+      }
+      .b6-input {
+        flex: 1;
+        background: #0F1A17;
+        border-radius: 999px;
+        padding: 22px 32px;
+        color: #F2EDE3;
+        font-size: 36px;
+        font-family: "Inter", sans-serif;
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+      }
+      .b6-input .b6-caret {
+        display: inline-block;
+        width: 3px;
+        height: 36px;
+        background: #E87B50;
+        vertical-align: middle;
+        margin-left: 4px;
+      }
+      .b6-post {
+        background: #E87B50;
+        color: #1A2622;
+        border-radius: 999px;
+        padding: 22px 38px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 600;
+        font-size: 36px;
+      }
+
+      /* Transition overlays — full-screen panels used for push/blur effects */
+      .transition-overlay {
+        position: absolute;
+        inset: 0;
+        background: #F2EDE3;
+        z-index: 10;
+        pointer-events: none;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="97.128"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- Background (no class="clip" so it's always visible) -->
+      <div id="bg-grid"></div>
+      <div id="bg-vignette"></div>
+
+      <!-- Narration audio on its own non-visual track -->
+      <audio
+        id="narration"
+        class="clip"
+        src="narration.mp3"
+        data-start="0"
+        data-duration="97.128"
+        data-track-index="0"
+        data-volume="1"
+      ></audio>
+
+      <!-- ============= BEAT 1 ============= -->
+      <div
+        id="beat1"
+        class="clip scene"
+        data-start="0"
+        data-duration="10.25"
+        data-track-index="1"
+        style="z-index: 1;"
+      >
+        <div class="scene-content">
+          <div id="b1-top" class="b1-tile">
+            <span class="led-dot"></span>
+            ANTHROPIC
+          </div>
+          <div id="b1-mid" class="b1-tile">
+            <span class="led-dot"></span>
+            Fable 5
+          </div>
+          <div id="b1-bot" class="b1-tile">
+            <span class="led-dot"></span>
+            <span>&gt; Claude Code</span>
+            <span id="b1-cursor"></span>
+          </div>
+          <div id="b1-dashed"></div>
+        </div>
+      </div>
+
+      <!-- ============= BEAT 2 ============= -->
+      <div
+        id="beat2"
+        class="clip scene"
+        data-start="9.7"
+        data-duration="24.9"
+        data-track-index="2"
+        style="z-index: 2;"
+      >
+        <div class="scene-content">
+          <div id="b2-title">// PROMPT</div>
+          <div id="b2-bubble">
+            <span class="word">build</span>
+            <span class="word">me</span>
+            <span class="word">a</span>
+            <span class="word">system</span>
+            <span class="word">that</span>
+            <span class="word">scrapes</span>
+            <span class="word">LinkedIn</span>
+            <span class="word">job</span>
+            <span class="word">posts,</span>
+            <span class="word">identifies</span>
+            <span class="word">the</span>
+            <span class="word">hiring</span>
+            <span class="word">manager,</span>
+            <span class="word">and</span>
+            <span class="word">drafts</span>
+            <span class="word">a</span>
+            <span class="word">cold</span>
+            <span class="word">email…</span>
+          </div>
+
+          <div class="b2-pipeline">
+            <div class="b2-node" id="b2-n1">
+              <span class="badge">in</span>
+              LinkedIn
+            </div>
+            <div class="b2-link" id="b2-l1"></div>
+            <div class="b2-node" id="b2-n2">
+              <span class="badge">·</span>
+              Scraper
+            </div>
+            <div class="b2-link" id="b2-l2"></div>
+            <div class="b2-node" id="b2-n3">
+              <span class="badge">·</span>
+              Hiring manager
+            </div>
+            <div class="b2-link" id="b2-l3"></div>
+            <div class="b2-node" id="b2-n4">
+              <span class="badge">✉</span>
+              Cold email
+            </div>
+          </div>
+
+          <div class="b2-check-wrap">
+            <div class="b2-check" id="b2-c1"><span class="tick">✓</span> Architecture</div>
+            <div class="b2-check" id="b2-c2"><span class="tick">✓</span> Scraper</div>
+            <div class="b2-check" id="b2-c3"><span class="tick">✓</span> Email logic</div>
+            <div class="b2-check" id="b2-c4"><span class="tick">✓</span> Tests</div>
+            <div class="b2-check" id="b2-c5"><span class="tick">✓</span> Self-fixed bugs</div>
+          </div>
+
+          <div id="b2-callout">You own the code.</div>
+        </div>
+      </div>
+
+      <!-- ============= BEAT 3 ============= -->
+      <div
+        id="beat3"
+        class="clip scene"
+        data-start="34.3"
+        data-duration="23.6"
+        data-track-index="1"
+        style="z-index: 3;"
+      >
+        <div class="scene-content">
+          <div id="b3-dash-title">Overnight Competitor Tracker</div>
+          <div class="b3-card" id="b3-card">
+            <div class="b3-row" id="b3-r1"><span class="name">Acme</span><span class="delta">▲ 4.2%</span></div>
+            <div class="b3-row" id="b3-r2"><span class="name">Northwind</span><span class="delta">▲ 2.1%</span></div>
+            <div class="b3-row" id="b3-r3"><span class="name">Globex</span><span class="delta">▲ 6.8%</span></div>
+            <div class="b3-row" id="b3-r4"><span class="name">Initech</span><span class="delta">▲ 1.5%</span></div>
+            <div class="b3-row" id="b3-r5"><span class="name">Hooli</span><span class="delta">▲ 3.9%</span></div>
+          </div>
+
+          <div class="b3-pricing" id="b3-pricing">
+            <span class="amount">$500</span>
+            <span class="per">/month</span>
+          </div>
+
+          <div class="b3-counter" id="b3-counter">
+            <div id="b3-amount">$0</div>
+            <div id="b3-sub">20 clients · monthly recurring revenue</div>
+          </div>
+          <div class="b3-confetti" id="b3-confetti"></div>
+        </div>
+      </div>
+
+      <!-- ============= BEAT 4 ============= -->
+      <div
+        id="beat4"
+        class="clip scene"
+        data-start="57.6"
+        data-duration="21.0"
+        data-track-index="2"
+        style="z-index: 4;"
+      >
+        <div class="scene-content">
+          <div id="b4-heading" data-layout-allow-overflow>Why Fable 5 wins</div>
+
+          <div id="b4-one-wrap" style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+            <div class="b4-number" id="b4-one">One.</div>
+            <div class="b4-sub" id="b4-one-sub">Runs autonomously for days</div>
+          </div>
+
+          <div id="b4-two-wrap" style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+            <div class="b4-number" id="b4-two">Two.</div>
+            <div class="b4-sub" id="b4-two-sub">You own the infrastructure</div>
+            <div class="b4-strike-row" id="b4-strike-row">
+              <span class="b4-strike" id="b4-s1">vendor lock-in<span class="line" id="b4-s1-line"></span></span>
+              <span class="b4-strike" id="b4-s2">per-run fees<span class="line" id="b4-s2-line"></span></span>
+            </div>
+          </div>
+
+          <div id="b4-three-wrap" style="display: flex; flex-direction: column; gap: 22px; align-items: center;">
+            <div class="b4-number" id="b4-three">Three.</div>
+            <div class="b4-sub" id="b4-three-sub">Self-corrects</div>
+            <div class="b4-clock" id="b4-clock">02:00 AM</div>
+            <div class="b4-err" id="b4-err">Error: timeout</div>
+            <div class="b4-patching" id="b4-patching">patching…</div>
+            <div class="b4-fixed" id="b4-fixed">✓ patched</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= BEAT 5 ============= -->
+      <div
+        id="beat5"
+        class="clip scene"
+        data-start="78.3"
+        data-duration="10.3"
+        data-track-index="1"
+        style="z-index: 5;"
+      >
+        <div class="scene-content">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div id="b5-label">Outcome as a service</div>
+            <div id="b5-underline"></div>
+          </div>
+
+          <div class="b5-flow">
+            <div class="b5-step" id="b5-s1">Client</div>
+            <div class="b5-arrow" id="b5-a1">↓</div>
+            <div class="b5-step money" id="b5-s2">$</div>
+            <div class="b5-arrow" id="b5-a2">↓</div>
+            <div class="b5-step" id="b5-s3">You</div>
+            <div class="b5-arrow" id="b5-a3">↓</div>
+            <div class="b5-step agent" id="b5-s4">
+              <div class="b5-mascot"></div>
+              <div>Agent</div>
+            </div>
+            <div class="b5-arrow" id="b5-a4">↓</div>
+            <div class="b5-step" id="b5-s5">System</div>
+            <div class="b5-arrow" id="b5-a5">↓</div>
+            <div class="b5-step" id="b5-s6">Outcome</div>
+          </div>
+
+          <div id="b5-tagline">
+            no middleware
+            <span class="strike-word">
+              tax<span id="b5-tagline-strike"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= BEAT 6 ============= -->
+      <div
+        id="beat6"
+        class="clip scene"
+        data-start="88.3"
+        data-duration="8.828"
+        data-track-index="2"
+        style="z-index: 6;"
+      >
+        <div class="scene-content">
+          <div id="b6-caption">7 agent startup ideas →</div>
+
+          <div id="b6-heading-wrap">
+            <div id="b6-heading">
+              Comment <span style="white-space: nowrap;">'agent ideas'</span>
+            </div>
+            <div id="b6-underline"></div>
+          </div>
+
+          <div class="b6-spacer"></div>
+
+          <div class="b6-composer">
+            <div class="b6-avatar"></div>
+            <div class="b6-input">
+              <span id="b6-typed"></span><span class="b6-caret"></span>
+            </div>
+            <div class="b6-post">Post</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transition overlays -->
+      <div class="transition-overlay" id="trans-1-2"></div>
+      <div class="transition-overlay" id="trans-2-3"></div>
+      <div class="transition-overlay" id="trans-3-4"></div>
+      <div class="transition-overlay" id="trans-4-5"></div>
+      <div class="transition-overlay" id="trans-5-6"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ============== Pre-state: hide everything that needs to enter ==============
+      // Beat 1
+      tl.set("#b1-top", { opacity: 0 }, 0);
+      tl.set("#b1-mid", { opacity: 0 }, 0);
+      tl.set("#b1-bot", { opacity: 0 }, 0);
+      tl.set("#b1-dashed", { scaleY: 0, opacity: 0 }, 0);
+      tl.set("#b1-cursor", { opacity: 1 }, 0);
+
+      // Beat 2 pre-state
+      tl.set("#b2-title", { opacity: 0 }, 0);
+      tl.set("#b2-bubble", { opacity: 0 }, 0);
+      tl.set(".b2-node", { opacity: 0 }, 0);
+      tl.set(".b2-link", { scaleY: 0, opacity: 0 }, 0);
+      tl.set(".b2-check", { opacity: 0 }, 0);
+      tl.set("#b2-callout", { opacity: 0 }, 0);
+
+      // Beat 3 pre-state
+      tl.set("#b3-dash-title", { opacity: 0 }, 0);
+      tl.set("#b3-card", { opacity: 0 }, 0);
+      tl.set(".b3-row", { opacity: 0 }, 0);
+      tl.set("#b3-pricing", { opacity: 0 }, 0);
+      tl.set("#b3-counter", { opacity: 0 }, 0);
+
+      // Beat 4 pre-state — hide all sub-beat groups
+      tl.set("#b4-heading", { opacity: 0 }, 0);
+      tl.set("#b4-one-wrap", { opacity: 0 }, 0);
+      tl.set("#b4-two-wrap", { opacity: 0 }, 0);
+      tl.set("#b4-three-wrap", { opacity: 0 }, 0);
+      tl.set(".b4-strike .line", { scaleX: 0 }, 0);
+      tl.set("#b4-err", { opacity: 0 }, 0);
+      tl.set("#b4-patching", { opacity: 0 }, 0);
+      tl.set("#b4-fixed", { opacity: 0 }, 0);
+
+      // Beat 5 pre-state
+      tl.set("#b5-label", { opacity: 0 }, 0);
+      tl.set("#b5-underline", { scaleX: 0 }, 0);
+      tl.set(".b5-step", { opacity: 0 }, 0);
+      tl.set(".b5-arrow", { opacity: 0 }, 0);
+      tl.set("#b5-tagline", { opacity: 0 }, 0);
+      tl.set("#b5-tagline-strike", { scaleX: 0 }, 0);
+
+      // Beat 6 pre-state
+      tl.set("#b6-caption", { opacity: 0 }, 0);
+      tl.set("#b6-heading-wrap", { opacity: 0 }, 0);
+      tl.set("#b6-underline", { scaleX: 0 }, 0);
+      tl.set(".b6-composer", { opacity: 0 }, 0);
+
+      // ============== BEAT 1 — 0 → 9.7 ==============
+      // Tile stack — staggered back.out entrances
+      tl.fromTo("#b1-top",
+        { opacity: 0, y: -80, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "back.out(1.5)" },
+        0.25
+      );
+      tl.fromTo("#b1-mid",
+        { opacity: 0, y: 60, scale: 0.85 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "back.out(1.5)" },
+        0.6
+      );
+      tl.fromTo("#b1-bot",
+        { opacity: 0, y: 80, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "back.out(1.5)" },
+        1.1
+      );
+      tl.fromTo("#b1-dashed",
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.5, ease: "power2.out" },
+        1.7
+      );
+
+      // Cursor pulse — finite repeat covering the rest of beat 1
+      // Cycle duration 1.0s, cover ~7s = 7 repeats (yoyo)
+      tl.to("#b1-cursor",
+        { opacity: 0.15, duration: 0.5, yoyo: true, repeat: 13, ease: "sine.inOut" },
+        2.2
+      );
+
+      // Subtle ambient float on the middle tile (breathing)
+      tl.to("#b1-mid",
+        { y: -8, duration: 2.4, yoyo: true, repeat: 2, ease: "sine.inOut" },
+        2.5
+      );
+
+      // ============== TRANSITION 1→2 — blur crossfade (~0.55s) ==============
+      // Outgoing scene blurs + slight scale; incoming scene fades from blur
+      tl.to("#beat1",
+        { filter: "blur(12px)", scale: 1.04, opacity: 0, duration: 0.55, ease: "power2.inOut" },
+        9.5
+      );
+      tl.fromTo("#beat2",
+        { filter: "blur(12px)", scale: 0.96, opacity: 0 },
+        { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.55, ease: "power2.inOut" },
+        9.7
+      );
+
+      // ============== BEAT 2 — 9.7 → 34.3 ==============
+      // Sub-beat A: prompt typing (9.7 → 17)
+      tl.fromTo("#b2-title",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        10.0
+      );
+      tl.fromTo("#b2-bubble",
+        { opacity: 0, y: 40, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+        10.3
+      );
+      // Stagger words in over ~5.5s (18 words, ~0.3s apart)
+      tl.to("#b2-bubble .word",
+        { opacity: 1, duration: 0.15, stagger: 0.3, ease: "none" },
+        10.9
+      );
+
+      // Sub-beat B: pipeline (17 → 28)
+      // Light cross-dissolve: title and bubble stay; pipeline appears below.
+      tl.fromTo("#b2-n1",
+        { opacity: 0, y: 40, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+        17.2
+      );
+      tl.fromTo("#b2-l1",
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.3, ease: "power2.out" },
+        17.7
+      );
+      tl.fromTo("#b2-n2",
+        { opacity: 0, y: 40, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+        18.0
+      );
+      tl.fromTo("#b2-l2",
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.3, ease: "power2.out" },
+        18.5
+      );
+      tl.fromTo("#b2-n3",
+        { opacity: 0, y: 40, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+        18.8
+      );
+      tl.fromTo("#b2-l3",
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.3, ease: "power2.out" },
+        19.3
+      );
+      tl.fromTo("#b2-n4",
+        { opacity: 0, y: 40, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+        19.6
+      );
+      // Light dissolve: fade the prompt sub-beat content slightly to make room visually (cross-dissolve)
+      tl.to(["#b2-title", "#b2-bubble"],
+        { opacity: 0.18, duration: 0.5, ease: "power2.inOut" },
+        17.0
+      );
+
+      // Sub-beat C: checklist (28 → 34.3)
+      // Bring pipeline out of focus (light cross-dissolve)
+      tl.to([".b2-node", ".b2-link"],
+        { opacity: 0.15, duration: 0.45, ease: "power2.inOut" },
+        27.8
+      );
+      tl.fromTo("#b2-c1",
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" },
+        28.2
+      );
+      tl.fromTo("#b2-c2",
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" },
+        28.5
+      );
+      tl.fromTo("#b2-c3",
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" },
+        28.8
+      );
+      tl.fromTo("#b2-c4",
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" },
+        29.1
+      );
+      tl.fromTo("#b2-c5",
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" },
+        29.4
+      );
+      tl.fromTo("#b2-callout",
+        { opacity: 0, scale: 0.6 },
+        { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" },
+        31.2
+      );
+
+      // ============== TRANSITION 2→3 — vertical push up (~0.6s) ==============
+      tl.to("#beat2",
+        { y: -1920, opacity: 0, duration: 0.6, ease: "power3.inOut" },
+        34.0
+      );
+      tl.fromTo("#beat3",
+        { y: 1920, opacity: 1 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power3.inOut" },
+        34.3
+      );
+
+      // ============== BEAT 3 — 34.3 → 57.6 ==============
+      // Sub-beat A: dashboard (34.3 → 42)
+      tl.fromTo("#b3-dash-title",
+        { opacity: 0, y: -30 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        34.6
+      );
+      tl.fromTo("#b3-card",
+        { opacity: 0, y: 40, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" },
+        34.9
+      );
+      tl.fromTo(".b3-row",
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.35, stagger: 0.18, ease: "expo.out" },
+        35.4
+      );
+
+      // Sub-beat B: pricing pill slams in (42 → 50)
+      // Light dissolve dashboard
+      tl.to(["#b3-dash-title", "#b3-card"],
+        { opacity: 0.15, duration: 0.4, ease: "power2.inOut" },
+        41.6
+      );
+      tl.fromTo("#b3-pricing",
+        { opacity: 0, scale: 0.4, rotation: -8 },
+        { opacity: 1, scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.7)" },
+        42.2
+      );
+      // Subtle breathe
+      tl.to("#b3-pricing",
+        { scale: 1.03, duration: 2.2, yoyo: true, repeat: 2, ease: "sine.inOut" },
+        43.2
+      );
+
+      // Sub-beat C: counter + confetti (50 → 57.6)
+      tl.to(["#b3-pricing"],
+        { opacity: 0.0, duration: 0.45, ease: "power2.inOut" },
+        49.8
+      );
+      tl.fromTo("#b3-counter",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        50.2
+      );
+
+      // Count $0 → $10,000 over 2.5s
+      const counterEl = { v: 0 };
+      tl.to(counterEl, {
+        v: 10000,
+        duration: 2.5,
+        ease: "power3.out",
+        onUpdate() {
+          const n = Math.round(counterEl.v);
+          const el = document.getElementById("b3-amount");
+          if (el) el.textContent = "$" + n.toLocaleString("en-US");
+        },
+      }, 50.8);
+
+      // Confetti — 14 seeded deterministic dots using mulberry32
+      function mulberry32(seed) {
+        return function () {
+          var t = (seed += 0x6d2b79f5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rand = mulberry32(20260611);
+      const confettiContainer = document.getElementById("b3-confetti");
+      const dotCount = 14;
+      const dotEls = [];
+      for (let i = 0; i < dotCount; i++) {
+        const dot = document.createElement("div");
+        dot.className = "b3-dot";
+        // Anchor near the counter center (canvas is 1080x1920; counter is around y ~ 1000)
+        dot.style.left = "540px";
+        dot.style.top = "1000px";
+        confettiContainer.appendChild(dot);
+        dotEls.push(dot);
+      }
+      // Animate confetti burst at counter landing (~53.5s)
+      const burstAt = 53.4;
+      tl.set(dotEls, { opacity: 0, x: 0, y: 0, scale: 0 }, burstAt - 0.01);
+      dotEls.forEach((dot, i) => {
+        const angle = rand() * Math.PI * 2;
+        const dist = 260 + rand() * 220;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist - 80; // bias slightly up
+        const dly = rand() * 0.12;
+        tl.fromTo(dot,
+          { opacity: 0, x: 0, y: 0, scale: 0 },
+          { opacity: 1, x: tx, y: ty, scale: 1, duration: 0.7, ease: "power3.out" },
+          burstAt + dly
+        );
+        // Fade out
+        tl.to(dot,
+          { opacity: 0, y: ty + 80, duration: 0.6, ease: "power2.in" },
+          burstAt + 0.9 + dly
+        );
+      });
+
+      // ============== TRANSITION 3→4 — scale + crossfade (~0.5s) ==============
+      tl.to("#beat3",
+        { scale: 1.08, opacity: 0, duration: 0.5, ease: "power2.inOut" },
+        57.3
+      );
+      tl.fromTo("#beat4",
+        { scale: 0.92, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: "power2.inOut" },
+        57.6
+      );
+
+      // ============== BEAT 4 — 57.6 → 78.3 ==============
+      // Heading appears first
+      tl.fromTo("#b4-heading",
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+        57.9
+      );
+      // Move heading up to top (cross-dissolve to keep showing)
+      tl.to("#b4-heading",
+        { opacity: 0.7, scale: 0.7, y: -400, duration: 0.6, ease: "power2.inOut" },
+        60.8
+      );
+
+      // ----- ONE (57.6 → 63) -----
+      tl.fromTo("#b4-one-wrap",
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "back.out(1.5)" },
+        60.5
+      );
+      // Light dissolve out ONE before TWO arrives
+      tl.to("#b4-one-wrap",
+        { opacity: 0, duration: 0.3, ease: "power2.inOut" },
+        62.6
+      );
+
+      // ----- TWO (63 → 69) -----
+      tl.fromTo("#b4-two-wrap",
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "back.out(1.5)" },
+        63.2
+      );
+      // Strike-through lines draw in
+      tl.to("#b4-s1-line",
+        { scaleX: 1, duration: 0.4, ease: "power3.out" },
+        64.2
+      );
+      tl.to("#b4-s2-line",
+        { scaleX: 1, duration: 0.4, ease: "power3.out" },
+        64.6
+      );
+      tl.to("#b4-two-wrap",
+        { opacity: 0, duration: 0.3, ease: "power2.inOut" },
+        68.6
+      );
+
+      // ----- THREE (69 → 78.3) -----
+      tl.fromTo("#b4-three-wrap",
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "back.out(1.5)" },
+        69.2
+      );
+      // Clock breathes
+      tl.to("#b4-clock",
+        { scale: 1.04, duration: 1.6, yoyo: true, repeat: 2, ease: "sine.inOut" },
+        71.0
+      );
+      // Error slides in
+      tl.fromTo("#b4-err",
+        { opacity: 0, x: -80 },
+        { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" },
+        72.6
+      );
+      tl.fromTo("#b4-patching",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+        73.6
+      );
+      // Patching pulses
+      tl.to("#b4-patching",
+        { opacity: 0.4, duration: 0.4, yoyo: true, repeat: 4, ease: "sine.inOut" },
+        74.0
+      );
+      tl.fromTo("#b4-fixed",
+        { opacity: 0, scale: 0.6 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.7)" },
+        76.0
+      );
+
+      // ============== TRANSITION 4→5 — horizontal push left (~0.55s) ==============
+      tl.to("#beat4",
+        { x: -1080, opacity: 0, duration: 0.55, ease: "power3.inOut" },
+        78.0
+      );
+      tl.fromTo("#beat5",
+        { x: 1080, opacity: 1 },
+        { x: 0, opacity: 1, duration: 0.55, ease: "power3.inOut" },
+        78.3
+      );
+
+      // ============== BEAT 5 — 78.3 → 88.3 ==============
+      tl.fromTo("#b5-label",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        78.6
+      );
+      tl.to("#b5-underline",
+        { scaleX: 1, duration: 0.5, ease: "power3.out" },
+        79.0
+      );
+
+      // Flow steps appear one by one
+      const flowItems = ["#b5-s1", "#b5-a1", "#b5-s2", "#b5-a2", "#b5-s3", "#b5-a3", "#b5-s4", "#b5-a4", "#b5-s5", "#b5-a5", "#b5-s6"];
+      flowItems.forEach((sel, i) => {
+        tl.fromTo(sel,
+          { opacity: 0, y: 30, scale: 0.92 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.4)" },
+          79.4 + i * 0.32
+        );
+      });
+      // Arrow pulse — coral arrowheads shimmer
+      tl.to(".b5-arrow",
+        { opacity: 0.5, duration: 0.5, yoyo: true, repeat: 2, ease: "sine.inOut", stagger: 0.05 },
+        83.6
+      );
+
+      // Tagline + strike
+      tl.fromTo("#b5-tagline",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        85.5
+      );
+      tl.to("#b5-tagline-strike",
+        { scaleX: 1, duration: 0.45, ease: "power3.out" },
+        86.4
+      );
+
+      // ============== TRANSITION 5→6 — blur crossfade (~0.55s) ==============
+      tl.to("#beat5",
+        { filter: "blur(10px)", opacity: 0, duration: 0.55, ease: "power2.inOut" },
+        88.0
+      );
+      tl.fromTo("#beat6",
+        { filter: "blur(10px)", opacity: 0 },
+        { filter: "blur(0px)", opacity: 1, duration: 0.55, ease: "power2.inOut" },
+        88.3
+      );
+
+      // ============== BEAT 6 — 88.3 → 97.128 ==============
+      tl.fromTo("#b6-caption",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        88.6
+      );
+      tl.fromTo("#b6-heading-wrap",
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+        88.9
+      );
+      tl.to("#b6-underline",
+        { scaleX: 1, duration: 0.55, ease: "power3.out" },
+        89.6
+      );
+      tl.fromTo(".b6-composer",
+        { opacity: 0, y: 80 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.4)" },
+        89.4
+      );
+
+      // Type "agent ideas" character by character into the input
+      const typeText = "agent ideas";
+      const typedEl = document.getElementById("b6-typed");
+      const charStart = 90.4;
+      const charDur = 0.18;
+      for (let i = 0; i <= typeText.length; i++) {
+        const slice = typeText.slice(0, i);
+        tl.call(() => {
+          if (typedEl) typedEl.textContent = slice;
+        }, [], charStart + i * charDur);
+      }
+
+      // Caret blink — finite repeats
+      tl.to(".b6-caret",
+        { opacity: 0.2, duration: 0.45, yoyo: true, repeat: 7, ease: "sine.inOut" },
+        90.4
+      );
+
+      // Final hold — let the comment sit. Beat 6 is the final scene, so we may fade out gently.
+      tl.to("#beat6",
+        { opacity: 0.95, duration: 0.5, ease: "sine.inOut" },
+        96.5
+      );
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
