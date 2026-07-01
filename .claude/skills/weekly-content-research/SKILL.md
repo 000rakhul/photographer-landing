@@ -59,11 +59,14 @@ End the message with: *"Reply **approve** to lock these in, or tell me what to s
 
 Once approved, fill in `templates/transcript-points-template.md` and save as `content/<week>/transcript-points.md`.
 
-For the long-form and each short:
-- A **hook** line for the first ~10 seconds.
-- 2–4 **fact bullets** — short, plain, one idea each. Enough to keep up with; not word-for-word.
-- A **`💬 Your view:`** prompt that nudges the creator's opinion (e.g. "Hype or real?", "Who does this hurt?").
+**Long-form** — each story gets **~1 minute of speaking time** (roughly 130–150 words of talking points, about 8–12 short bullets). Give enough to fill the minute without a full script:
+- A **hook** line for the first ~10 seconds (video-level).
+- Per story: what happened, the key numbers/details, a bit of context, why it matters — as short, plain bullets, one idea each.
+- Label each story block with `(~1 min)` so the creator can pace it.
+- A **`💬 Your view:`** prompt per story that nudges the creator's opinion (e.g. "Hype or real?", "Who does this hurt?").
 - A closing **CTA** line.
+
+**Shorts** — keep each tight for 30–45s: hook + the one point + a `💬 Your view:` + CTA. Do not pad these to a minute; the short format is the point.
 
 **Then check readability** — this is required:
 

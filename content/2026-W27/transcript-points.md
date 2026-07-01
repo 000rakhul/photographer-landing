@@ -2,6 +2,7 @@
 
 > Talking points, not a script. Read the point, then say it your way.
 > 💬 = drop your own opinion here.
+> Long-form stories are paced for ~1 min each. Shorts stay tight (30–45s).
 > Readability target: grade 4. Short lines. Plain words.
 
 ## 🎬 Long-form: AI Just Got Cheap Enough to Scare Everyone
@@ -11,38 +12,93 @@
 - Google started losing its best people.
 - Let me show you what really matters.
 
-**Story 1 — Claude Sonnet 5:**
-- What happened: Anthropic dropped a new model on June 30.
-- It runs on its own. It can plan and use tools.
-- The price: just $2 for a million words in.
-- Why it matters: strong AI agents used to cost a lot. Now they don't.
-- 💬 Your view: Will you build an agent now that it's this cheap?
+**Story 1 — Claude Sonnet 5 (~1 min):**
+- On June 30, Anthropic put out Claude Sonnet 5.
+- They call it their most "agentic" Sonnet yet.
+- Agentic just means it can work on its own.
+- It can plan the steps.
+- It can use a web browser.
+- It can use a terminal, like a coder would.
+- A few months ago, this took a much bigger model.
+- Now the mid-size one does it.
+- Here's the big deal: the price.
+- It's two dollars for a million words in.
+- It's ten dollars for a million words out.
+- Heads up — that price goes up after August 31.
+- And it's live right now. Free plans, paid plans, the app, the code tool.
+- On tests, it is closing in on the top Opus model.
+- But it costs a lot less.
+- Why it matters: cheap plus smart means more people build AI agents.
+- The wall just came down.
+- 💬 Your view: Will you build an agent now that it's this cheap? What would you make first?
 
-**Story 2 — Grok 4.5:**
-- What happened: Musk says Grok 4.5 is in a private test.
-- It is testing inside Tesla and SpaceX first.
-- It is huge — 1.5 trillion parts.
-- Why it matters: he tries new AI on his own firms before the world.
-- 💬 Your view: Smart move, or a big risk?
+**Story 2 — Grok 4.5 (~1 min):**
+- On June 28, Musk said Grok 4.5 is in a private test.
+- It is not out for us yet.
+- He is testing it inside Tesla and SpaceX first.
+- His own companies get it before the world does.
+- And it is huge. 1.5 trillion parts.
+- That's more than twice the last one.
+- It also learned from a coding tool called Cursor.
+- So he wants it strong at writing code.
+- A note: the bigger Grok 5 is still training. No date yet.
+- People both love and fear Grok's bold style.
+- xAI says this one is built to win at code.
+- Why it matters: Musk tries new AI on real work first.
+- Real cars. Real rockets. Real risk.
+- If it slips up, it slips up in the real world.
+- 💬 Your view: Smart move to test on his own firms, or too risky?
 
-**Story 3 — Google brain drain:**
-- What happened: two star minds are leaving Google.
-- One leads Gemini. He is off to OpenAI.
-- One built AlphaFold. He is off to Anthropic.
-- Why it matters: the fight for top talent is brutal right now.
-- 💬 Your view: Is Google in real trouble here?
+**Story 3 — Google brain drain (~1 min):**
+- Two star minds are walking out of Google.
+- The first helped lead Gemini, Google's top AI.
+- He is off to OpenAI.
+- The second built AlphaFold.
+- That work even won a Nobel Prize.
+- He is off to Anthropic after nine years.
+- And the timing is loud.
+- Anthropic held an "AI for Science" event on June 30.
+- That is the exact space this new hire knows best.
+- Why it matters: the fight for top AI talent is brutal.
+- Star pay can hit tens of millions a year.
+- Rivals are raiding Google on purpose.
+- These people are worth more than most whole teams.
+- When they leave, ideas leave with them.
+- Losing two in one short stretch is rare.
+- 💬 Your view: Is Google in real trouble, or can it bounce back?
 
-**Story 4 — GPT-5.6 preview:**
-- What happened: OpenAI showed off GPT-5.6, called Sol.
-- Reports say it may read a whole book at once. (Not yet confirmed.)
-- It also has a new fix for past safety slips.
+**Story 4 — GPT-5.6 preview (~1 min):**
+- OpenAI gave us a peek at GPT-5.6.
+- They call the top one "Sol."
+- There are two more, for cheaper and faster jobs.
+- Reports say it may read a whole book at once.
+- That's a much bigger memory than before.
+- But careful — OpenAI has not confirmed that yet.
+- So treat it as a rumor for now.
+- It also has a fresh fix for past safety slips.
+- The last model had some trust problems.
+- This one was trained to catch those early.
+- It is not fully out. That comes soon.
 - Why it matters: more memory means it can hold way more at a time.
-- 💬 Your view: Is a bigger memory the thing you actually want?
+- Whole projects, not just a chat.
+- 💬 Your view: Is a bigger memory what you want? Or do you care more about trust?
 
-**Story 5 — ChatGPT loses the lead:**
-- What happened: ChatGPT fell below half the market.
-- It sits at 46%. Gemini is at 28%. Claude is at 10%.
-- Why it matters: the one-king era is over. It's a real race now.
+**Story 5 — ChatGPT loses the lead (~1 min):**
+- ChatGPT just fell below half the market.
+- It sits at about 46 percent now.
+- That's the first time under half since it launched.
+- Gemini is climbing fast — near 28 percent.
+- Claude is up too — around 10 percent.
+- ChatGPT is still the biggest by users.
+- Over a billion people use it each month.
+- But the gap is closing.
+- One big reason: Gemini is baked into Android phones.
+- It's just there, out of the box.
+- Claude grew about four times this year.
+- People switch when trust or price shifts.
+- Why it matters: the one-king era is over.
+- It's a real race now, with three strong players.
+- Being on every phone is a huge edge.
 - 💬 Your view: Who do you think wins the race in a year?
 
 **Outro / CTA:**
